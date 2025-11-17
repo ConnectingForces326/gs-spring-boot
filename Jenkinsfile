@@ -21,4 +21,34 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts 'targe
+                    archiveArtifacts 'target/*.jar'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh './mvnw -B test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        // 🔥 NEW STAGE: uploads the built jar to Nexus
+        stage('Upload Jar to Nexus') {
+            steps {
+                sh '''
+                    JAR_FILE=$(ls target/*.jar | head -n 1)
+                    echo "Uploading $JAR_FILE to Nexus..."
+
+                    curl -v -u admin:admin123 \
+                      --upload-file "$JAR_FILE" \
+                      "http://host.docker.internal:8081/repository/maven-releases/com/example/demo/$(basename "$JAR_FILE")"
+                '''
+            }
+        }
+    }
+}
