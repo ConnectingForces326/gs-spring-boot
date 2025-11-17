@@ -17,10 +17,12 @@ pipeline {
 
         stage('Build') {
             steps {
+                // build the Spring Boot jar
                 sh './mvnw -B -DskipTests clean package'
             }
             post {
                 success {
+                    // keep the jar as a build artifact
                     archiveArtifacts 'target/*.jar'
                 }
             }
@@ -37,7 +39,7 @@ pipeline {
             }
         }
 
-        // 🔥 NEW STAGE: uploads the built jar to Nexus
+        // 🔥 THIS is what sends the jar to Nexus
         stage('Upload Jar to Nexus') {
             steps {
                 sh '''
