@@ -8,18 +8,17 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Prep') {
             steps {
-                // Build the Spring Boot app inside the "complete" folder
-                sh 'mvn -B -f complete/pom.xml clean package'
+                // make mvnw executable, ignore error if it already is
+                sh 'chmod +x mvnw || true'
             }
         }
 
-        stage('Archive Jar') {
+        stage('Build') {
             steps {
-                // Save the jar file from the "complete/target" folder
-                archiveArtifacts artifacts: 'complete/target/*.jar', fingerprint: true
+                sh './mvnw -B -DskipTests clean package'
             }
-        }
-    }
-}
+            post {
+                success {
+                    archiveArtifacts 'targe
