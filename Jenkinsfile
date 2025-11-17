@@ -10,19 +10,16 @@ pipeline {
 
         stage('Prep') {
             steps {
-                // make mvnw executable, ignore error if it already is
                 sh 'chmod +x mvnw || true'
             }
         }
 
         stage('Build') {
             steps {
-                // build the Spring Boot jar
                 sh './mvnw -B -DskipTests clean package'
             }
             post {
                 success {
-                    // keep the jar as a build artifact
                     archiveArtifacts 'target/*.jar'
                 }
             }
@@ -39,7 +36,7 @@ pipeline {
             }
         }
 
-        // 🔥 THIS is what sends the jar to Nexus
+        // 🔥 NEW: this is the part that sends the JAR to Nexus
         stage('Upload Jar to Nexus') {
             steps {
                 sh '''
